@@ -113,7 +113,9 @@ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-bl
 <section id="pane-form">
   <div class="card">
     <label class="f" for="nm">姓名 *</label><input type="text" id="nm" autocomplete="name" placeholder="例如：王小明">
-    <p class="hint" style="margin-top:8px">要修改或取消，輸入同一個姓名就會帶出你的訂單</p>
+    <label class="f" for="pin" style="margin-top:12px">4 位數密碼 *</label>
+    <div style="display:flex;gap:8px"><input type="password" id="pin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="自己設定 4 個數字" style="flex:1"><button class="btn ghost sm" id="loadmine" type="button" hidden>帶出我的訂單</button></div>
+    <p class="hint" style="margin-top:8px">第一次送出時自己設一組密碼，之後修改或取消都要用同一組，別人不知道密碼就改不了你的單。忘記密碼請找員購負責人。</p>
     <p class="msg" id="loadmsg">載入中…</p>
   </div>
   <h2>衣服</h2><p class="hint">F 為單一尺寸，點「尺寸表」看各尺寸數字</p>
@@ -252,22 +254,34 @@ function syncForm(){
   $('save').textContent=saving?'送出中…':mine?(dirty?'更新訂單':'已送出 ✓'):'送出訂單';
   if(closed()){
     document.querySelectorAll('.step button').forEach(x=>x.disabled=true);
-    ['nm','clear','cancel','save'].forEach(id=>$(id).disabled=true);
+    ['nm','pin','loadmine','clear','cancel','save'].forEach(id=>$(id).disabled=true);
     $('cancel').hidden=true;$('save').textContent='已截止';
     $('dl').textContent='已於 12/7（一）18:00 截止';
     say('loadmsg','員購已截止，可到「統計總表」查看結果');
   }
 }
 function markDirty(){dirty=true;syncForm()}
-let lookSeq=0;
+let lookSeq=0,exists=false;
+const pinOK=()=>/^\d{4}$/.test($('pin').value);
 function matchName(){
   const name=$('nm').value.trim();const seq=++lookSeq;
-  if(!name){if(mine){mine=null;syncForm()}return}
-  call('getMine',[name],r=>{if(seq!==lookSeq)return;const m=r.order;
-    if(m){if(!mine||norm(mine.name)!==norm(m.name)){mine=m;draft={...m.items};dirty=false;say('loadmsg',`已帶出「${m.name}」送出的訂單，可直接修改`)}}
-    else if(mine){mine=null;dirty=true;say('loadmsg','')}
+  if(mine&&norm(mine.name)!==norm(name)){mine=null;dirty=true}
+  if(!name){exists=false;$('loadmine').hidden=true;syncForm();return}
+  call('getMine',[name],r=>{if(seq!==lookSeq)return;exists=!!r.exists;
+    $('loadmine').hidden=!exists||!!mine;
+    if(exists&&!mine)say('loadmsg','這個名字已經有訂單，輸入當時設的密碼，再按「帶出我的訂單」');
+    else if(!exists&&!mine&&/^這個名字已經有訂單/.test($('loadmsg').textContent))say('loadmsg','');
     syncForm()},()=>{});
 }
+function loadMine(){
+  const name=$('nm').value.trim();
+  if(!pinOK()){say('loadmsg','請輸入 4 位數密碼');$('pin').focus();return}
+  say('loadmsg','讀取中…');
+  call('login',[name,$('pin').value],r=>{if(r.order){mine=r.order;draft={...r.order.items};dirty=false;$('loadmine').hidden=true;say('loadmsg',`已帶出「${r.order.name}」的訂單，可直接修改`)}else{exists=false;$('loadmine').hidden=true;say('loadmsg','找不到這個名字的訂單')}syncForm()},onErr);
+}
+$('loadmine').onclick=loadMine;
+$('pin').addEventListener('input',()=>{$('pin').value=$('pin').value.replace(/\D/g,'').slice(0,4)});
+$('pin').addEventListener('keydown',e=>{if(e.key==='Enter'&&exists&&!mine)loadMine()});
 document.addEventListener('click',e=>{
   const b=e.target.closest('button[data-k]');if(!b)return;
   if(closed()){syncForm();return}
@@ -285,7 +299,7 @@ function onMine(res){mine=res.order||null;syncForm()}
 function onErr(e){saving=false;$('save').disabled=false;say('loadmsg',(e&&e.message||'發生錯誤').replace(/^Exception:\s*/,''));syncForm()}
 // 呼叫後端；人多或網路不穩時自動重試（最多 4 次，間隔逐次拉長）
 async function api(fn,args){
-  const body=fn==='submitOrder'?{action:'submit',name:args[0],items:args[1]}:fn==='cancelOrder'?{action:'cancel',name:args[0]}:fn==='admin'?{action:'admin',password:args[0]}:null;
+  const body=fn==='submitOrder'?{action:'submit',name:args[0],pin:args[1],items:args[2]}:fn==='cancelOrder'?{action:'cancel',name:args[0],pin:args[1]}:fn==='login'?{action:'login',name:args[0],pin:args[1]}:fn==='admin'?{action:'admin',password:args[0]}:null;
   const res=fn==='getMine'?await fetch(API+'?name='+encodeURIComponent(args[0])+'&t='+Date.now()):await fetch(API,{method:'POST',body:JSON.stringify(body)});
   const j=await res.json();if(j.error)throw new Error(j.error);return j}
 function call(fn,args,ok,fail,tries=0){
@@ -299,11 +313,12 @@ function save(){
   if(closed()){syncForm();return}
   const name=$('nm').value.trim();
   if(!name){say('loadmsg','請先填寫姓名');$('nm').focus();return}
+  if(!pinOK()){say('loadmsg','請設定 4 位數密碼');$('pin').focus();return}
   if(!tally(draft).q){say('loadmsg','還沒選任何品項喔');return}
   if(tally(draft).q>MAX){say('loadmsg',`每人限購 ${MAX} 件，請減少數量`);return}
   if(saving)return;saving=true;$('save').disabled=true;syncForm();
   const was=!!mine;
-  call('submitOrder',[name,draft],r=>{saving=false;$('save').disabled=false;dirty=false;onMine(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓')},onErr);
+  call('submitOrder',[name,$('pin').value,draft],r=>{saving=false;$('save').disabled=false;dirty=false;exists=true;$('loadmine').hidden=true;onMine(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓，之後修改請用同一組密碼')},e=>{if(/^密碼錯誤$/.test(e&&e.message||''))e={message:'密碼錯誤：這個名字已經有人送出過訂單，請輸入當時設的密碼'};onErr(e)});
 }
 $('save').onclick=()=>{if(!$('pane-form').hidden)save();else show('form')};
 let cancelArm=false;
@@ -311,7 +326,7 @@ $('cancel').onclick=()=>{
   if(closed()||!mine){syncForm();return}
   if(!cancelArm){cancelArm=true;$('cancel').textContent='再按一次確認取消';setTimeout(()=>{cancelArm=false;$('cancel').textContent='取消我的訂單'},4000);return}
   cancelArm=false;$('cancel').textContent='取消我的訂單';
-  call('cancelOrder',[mine.name],r=>{draft={};dirty=false;onMine(r);say('loadmsg','訂單已取消')},onErr);
+  call('cancelOrder',[mine.name,$('pin').value],r=>{exists=false;draft={};dirty=false;onMine(r);say('loadmsg','訂單已取消')},onErr);
 };
 
 // ---- summary
