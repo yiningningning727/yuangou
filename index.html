@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>何樂音樂《要去什麼地方》周邊員購</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: friendly office order sheet
+   IDEA: the tour's merch sheets — ultramarine ink, everything printed in white on blue
+   PICTURE: product sheet gallery, then the order form with a big live total
+   COLOUR and TYPE: one ultramarine field (#1e2aa8), white ink, paper-white buttons; Noto Sans TC + Caveat
+   LAYOUT: header, gallery strip, tabs, one calm column, sticky total bar */
+:root{color-scheme:dark;--bg:#1e2aa8;--deep:#15207f;--card:rgba(255,255,255,.09);--card2:rgba(255,255,255,.16);
+--ink:#ffffff;--soft:rgba(255,255,255,.74);--line:rgba(255,255,255,.26);--paper:#f6f4ee;--warn:#ffd36b}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip;padding-bottom:96px}
+.wrap{max-width:760px;margin:0 auto;padding:0 max(4vw,16px)}
+header{padding:28px 0 6px;position:relative;overflow:hidden}
+header .logo{display:block;width:clamp(140px,34vw,190px);height:auto;margin-bottom:10px}
+header h1{margin:6px 0 4px;font-size:clamp(28px,6vw,40px);line-height:1.12;font-weight:900;text-wrap:balance;padding-right:76px}
+header p{margin:0 0 14px;color:var(--soft);font-size:15px}
+header p b{color:var(--ink)}
+header svg.deco{position:absolute;right:max(4vw,12px);top:20px;width:80px;height:104px;opacity:.9}
+.gal{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px max(4vw,16px) 14px;margin:0 calc(-1*max(4vw,16px));scrollbar-width:thin}
+.gal button{flex:none;width:min(58vw,220px);aspect-ratio:4/5;padding:0;border:0;border-radius:14px;overflow:hidden;cursor:pointer;scroll-snap-align:start;background:var(--paper);box-shadow:0 8px 20px rgba(5,10,60,.35)}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.galhint{font-size:13px;color:var(--soft);margin:0 0 14px}
+.tabs{display:flex;gap:8px;margin-top:4px}
+.tabs button{flex:1;max-width:180px;font:inherit;font-weight:700;font-size:16px;padding:10px;border:1.5px solid var(--line);border-radius:99px;background:transparent;color:var(--ink);cursor:pointer;min-height:46px}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+section[hidden]{display:none}
+.card{background:var(--card);border-radius:16px;padding:16px;margin:16px 0}
+label.f{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+input[type=text]{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:rgba(255,255,255,.08);color:var(--ink)}
+input::placeholder{color:rgba(255,255,255,.5)}
+h2{font-size:20px;margin:26px 0 6px}
+.hint{color:var(--soft);font-size:14px;margin:0}
+.item{background:var(--card);border-radius:16px;padding:12px;margin:10px 0;border:2px solid transparent;transition:border-color .2s;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:start}
+.item.on{border-color:var(--ink);background:var(--card2)}
+.thumb{width:76px;aspect-ratio:4/5;border:0;padding:0;border-radius:10px;overflow:hidden;background:var(--paper);cursor:pointer}
+.thumb img{width:100%;height:100%;object-fit:contain;display:block}
+.ih{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap}
+.ih h3{margin:0;font-size:17px;font-weight:700}
+.pr{font-weight:900;white-space:nowrap}
+.vs{display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:8px;margin-top:10px}
+.v{display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,.07);border-radius:12px;padding:4px 4px 4px 12px;border:1.5px solid var(--line)}
+.v.one{grid-column:1/-1;max-width:220px}
+.v>span{font-weight:700;font-size:15px}
+.step{display:flex;align-items:center}
+.step button{width:40px;height:40px;border-radius:10px;border:0;background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;line-height:1}
+.step button:active{background:var(--card2)}
+.step button:disabled{opacity:.3;cursor:default}
+.step output{min-width:26px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--deep);color:var(--ink);padding:12px max(4vw,16px) calc(12px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -6px 24px rgba(5,10,60,.4)}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding:0}
+.bar .t{flex:1;line-height:1.2}
+.bar .t small{display:block;color:var(--soft);font-size:13px}
+.bar .t b{font-size:24px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn{font:inherit;font-weight:700;font-size:16px;border:0;border-radius:12px;padding:12px 18px;min-height:48px;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{min-height:40px;padding:8px 12px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:default}
+.msg{font-size:14px;margin:10px 0 0;min-height:1.4em;color:var(--warn);font-weight:700}
+.big{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.big div{background:var(--card);border-radius:16px;padding:14px}
+.big small{color:var(--soft);font-size:13px;display:block}
+.big b{font-size:clamp(22px,5vw,30px);font-variant-numeric:tabular-nums;white-space:nowrap}
+.big .hero{grid-column:1/-1;background:var(--ink);color:var(--bg)}
+.big .hero small{color:var(--bg);opacity:.75}.big .hero b{font-size:clamp(32px,9vw,52px)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--soft);font-weight:500}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.del{font:inherit;font-size:13px;background:none;border:0;color:var(--soft);text-decoration:underline;cursor:pointer;padding:4px}
+.sz{margin-top:8px}.sz summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--soft);padding:4px 0;min-height:32px}
+.sz table{font-size:13px;margin-top:4px;min-width:280px}.sz th,.sz td{padding:6px 6px}.szn{margin:4px 0 0;font-size:12px;color:var(--soft)}
+.scroll{overflow-x:auto}
+.empty{text-align:center;color:var(--soft);padding:28px 10px}
+.lb{position:fixed;inset:0;z-index:20;background:rgba(8,12,60,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:calc(100vh - 110px);border-radius:12px;display:block}
+.lb .ctl{display:flex;gap:10px;margin-top:12px}
+@media(max-width:600px){header svg.deco{width:56px;height:74px}header h1{padding-right:56px}
+table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:6em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:5.5em;margin-inline-start:-6em;color:var(--soft)}.stack td:empty{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img class="logo" src="img/logo.png" alt="The Land of Maybe — Hebe Tien" width="524" height="296">
+    <h1>何樂音樂 《要去什麼地方》<br>演唱會周邊商品 員購</h1>
+    <p>每人限購 4 件｜<b id="dl">截止：12/7（一）18:00</b><br>選好後按「送出」，截止前可隨時回來修改</p>
+    <svg class="deco" viewBox="0 0 92 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10 22h72l-12 16H22z" fill="currentColor" fill-opacity=".25"/><path d="M46 22V6l14 12"/>
+      <path d="M8 60q9-8 19 0t19 0 19 0 19 0"/><path d="M8 74q9-8 19 0t19 0 19 0 19 0"/>
+      <path d="M46 88l5 12 12 2-10 7 3 11-10-7-10 7 3-11-10-7 12-2z" fill="currentColor" fill-opacity=".25"/>
+    </svg>
+    <div class="gal" id="gal"></div>
+    <p class="galhint">左右滑看商品圖，點圖可放大</p>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-form" aria-selected="true">我的訂購</button>
+      <button role="tab" id="tab-sum" aria-selected="false">統計總表</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="pane-form">
+  <div class="card">
+    <label class="f" for="nm">姓名 *</label><input type="text" id="nm" autocomplete="name" placeholder="例如：王小明">
+    <p class="hint" style="margin-top:8px">要修改或取消，輸入同一個姓名就會帶出你的訂單</p>
+    <p class="msg" id="loadmsg">載入中…</p>
+  </div>
+  <h2>衣服</h2><p class="hint">F 為單一尺寸，點「尺寸表」看各尺寸數字</p>
+  <div id="g-wear"></div>
+  <h2>其他周邊</h2>
+  <div id="g-goods"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:18px 0">
+    <button class="btn ghost sm" id="clear" type="button">全部清空</button>
+    <button class="btn ghost sm" id="cancel" type="button" hidden>取消我的訂單</button>
+  </div>
+</section>
+
+<section id="pane-sum" hidden>
+  <div class="big">
+    <div class="hero"><small>全部總金額</small><b id="s-amt">NT$0</b></div>
+    <div><small>訂購人數</small><b id="s-ppl">0</b></div>
+    <div><small>總件數</small><b id="s-qty">0</b></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap">
+    <h2 style="margin-bottom:0">各品項數量</h2>
+    <span style="display:flex;gap:8px"><button class="btn ghost sm" id="refresh" type="button">重新整理</button><button class="btn sm" id="copy" type="button">複製統計文字</button></span>
+  </div>
+  <p class="msg" id="copymsg"></p>
+  <table class="stack"><thead><tr><th>品項</th><th>款式 / 尺寸</th><th class="n">單價</th><th class="n">數量</th><th class="n">小計</th></tr></thead><tbody id="t-items"></tbody></table>
+  <h2>每人明細</h2>
+  <table class="stack"><thead><tr><th>姓名</th><th>品項</th><th class="n">金額</th><th></th></tr></thead><tbody id="t-ppl"></tbody></table>
+</section>
+</main>
+
+<div class="bar" id="bar"><div class="wrap">
+  <div class="t"><small id="b-sub">已選 0 / 4 件</small><b id="b-amt">NT$0</b></div>
+  <button class="btn" id="save" type="button">送出訂單</button>
+</div></div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-label="商品圖">
+  <img id="lb-img" alt="">
+  <div class="ctl">
+    <button class="btn ghost sm" id="lb-prev" type="button">上一張</button>
+    <button class="btn sm" id="lb-close" type="button">關閉</button>
+    <button class="btn ghost sm" id="lb-next" type="button">下一張</button>
+  </div>
+</div>
+
+<script>{
+// ▼ Apps Script 網頁應用程式網址
+const API='https://script.google.com/macros/s/AKfycbxDJkeE1o2YgOZ9DSSKDjFD9QQV3gVXGK0UbXGI5qPwN1Hys2HV6nkNtSFpQZe49y0IkQ/exec';
+const IMG=[
+ {f:'img/tees.jpg',t:'黑T恤、白T恤'},
+ {f:'img/sweats-shirt.jpg',t:'大學T、襯衫'},
+ {f:'img/pouch.jpg',t:'過夜包'},
+ {f:'img/sticker-camera.jpg',t:'透明貼、即可拍'},
+ {f:'img/totes.jpg',t:'帆布包（大、小）'},
+ {f:'img/socks-towel-tag.jpg',t:'羊毛襪、毛巾、行李吊牌'},
+ {f:'img/blindbox.jpg',t:'盲盒'}
+];
+const SZ=['S','M','L','XL'];
+const P=[
+ {id:'tee-black',g:'wear',name:'貼著標籤的黑T恤',price:900,v:SZ,img:0},
+ {id:'tee-white',g:'wear',name:'沾著氣味的白T恤',price:900,v:SZ,img:0},
+ {id:'shirt',g:'wear',name:'折疊就恢復原狀乾淨的襯衫',price:1350,v:['F'],img:1},
+ {id:'sweat-navy',g:'wear',name:'哪裡算蹉跎 深海藍大學T',price:1350,v:['S/M','L/XL'],img:1},
+ {id:'sweat-purple',g:'wear',name:'哪裡算蹉跎 淺紫色寬袖大學T',price:1350,v:['F'],img:1},
+ {id:'sweat-green',g:'wear',name:'哪裡算蹉跎 淺綠色寬袖大學T',price:1350,v:['F'],img:1},
+ {id:'socks',g:'goods',name:'我拼命的走 羊毛襪',price:600,v:['23-25 cm','25-27 cm'],img:5},
+ {id:'towel',g:'goods',name:'展開在我眼前 特殊版型毛巾',price:350,v:['12x94 cm'],img:5},
+ {id:'tote-l',g:'goods',name:'有時淡 有時濃 帆布包_大',price:600,v:['有時淡·藍','有時濃·咖'],img:4},
+ {id:'tote-s',g:'goods',name:'有時輕 有時重 帆布包_小',price:500,v:['一點·黃光','山林·野綠','淺淺·粉笑','橘子·熟了'],img:4},
+ {id:'pouch',g:'goods',name:'你啊就別再煩惱了過夜包',price:800,v:['放下·咖','自在·綠'],img:2},
+ {id:'camera',g:'goods',name:'值得紀念的瞬間 即可拍',price:1350,img:3},
+ {id:'box',g:'goods',name:'啊啊啊！盲盒',price:550,img:6,note:'隨機出貨，不能指定款式'},
+ {id:'tag',g:'goods',name:'要去什麼地方 行李吊牌',price:350,img:5},
+ {id:'sticker',g:'goods',name:'我隨處都在 透明貼',price:200,img:3}
+];
+const TEE={h:['尺寸','肩寬','胸寬','衣長','袖長'],r:[['S',50,56,67,19.5],['M',52,58.5,69.5,20.5],['L',54,61,72,21.5],['XL',56,63.5,74.5,22.5]]};
+const WIDE={h:['尺寸','肩寬','胸寬','衣長（前）','下擺寬','袖長'],r:[['F',63,66,69,45,55]]};
+const SIZE={'tee-black':TEE,'tee-white':TEE,
+ 'shirt':{h:['尺寸','肩寬','胸寬','衣長（前）','衣長（後）','袖長'],r:[['F',54,59,75,83,56]]},
+ 'sweat-navy':{h:['尺寸','肩寬','胸寬','衣長','袖長','領圍'],r:[['S/M ①',58,59,69,56,19],['L/XL ②',61,62,73,59,20.5]]},
+ 'sweat-purple':WIDE,'sweat-green':WIDE};
+const sizeHTML=id=>{const t=SIZE[id];if(!t)return'';return `<details class="sz"><summary>尺寸表</summary><div class="scroll"><table><thead><tr>${t.h.map((h,i)=>`<th${i?' class="n"':''}>${h}</th>`).join('')}</tr></thead><tbody>${t.r.map(row=>`<tr>${row.map((c,i)=>`<td${i?' class="n"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="szn">平量，單位 cm，±2 cm 屬正常誤差</p></details>`};
+const MAX=4;
+const DEADLINE=new Date('2026-12-07T18:00:00+08:00').getTime();
+P.forEach(p=>p.pimg='img/p/'+p.id+'.jpg');
+const closed=()=>Date.now()>DEADLINE;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>'NT$'+Math.round(n).toLocaleString('en-US');
+const K=(id,v)=>id+'|'+(v||'');
+const prod=k=>P.find(p=>p.id===k.split('|')[0]);
+const norm=s=>String(s||'').replace(/\s+/g,'').toLowerCase();
+let orders=[],mine=null,draft={},saving=false,dirty=false,loaded=false;
+
+function tally(items){let q=0,a=0;for(const k in items){const n=Math.max(0,parseInt(items[k])||0),p=prod(k);if(!p)continue;q+=n;a+=n*p.price}return{q,a}}
+function itemText(items){return P.flatMap(p=>(p.v||['']).map(v=>{const n=+(items||{})[K(p.id,v)]||0;return n?`${p.name}${v?'（'+v+'）':''} ${fmt(p.price)}×${n}`:''})).filter(Boolean)}
+function say(id,t){$(id).textContent=t}
+
+// ---- gallery + lightbox
+$('gal').innerHTML=IMG.map((m,i)=>`<button type="button" data-img="${i}" aria-label="放大：${m.t}"><img src="${m.f}" alt="${m.t}" loading="lazy"></button>`).join('');
+let cur=0,LIST=IMG;
+const PIMG=()=>P.map(p=>({f:p.pimg,t:p.name}));
+function openLb(i,list){if(list)LIST=list;cur=(i+LIST.length)%LIST.length;$('lb-img').src=LIST[cur].f;$('lb-img').alt=LIST[cur].t;$('lb').hidden=false;$('lb-close').focus()}
+function closeLb(){$('lb').hidden=true}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-img]');if(b)openLb(+b.dataset.img,IMG);const q=e.target.closest('[data-pimg]');if(q)openLb(P.findIndex(p=>p.id===q.dataset.pimg),PIMG())});
+$('lb-close').onclick=closeLb;$('lb-prev').onclick=()=>openLb(cur-1);$('lb-next').onclick=()=>openLb(cur+1);
+$('lb').addEventListener('click',e=>{if(e.target===$('lb'))closeLb()});
+document.addEventListener('keydown',e=>{if($('lb').hidden)return;if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')openLb(cur-1);if(e.key==='ArrowRight')openLb(cur+1)});
+
+// ---- form
+function renderForm(){
+  for(const g of ['wear','goods']){
+    $('g-'+g).innerHTML=P.filter(p=>p.g===g).map(p=>{const vs=p.v||[''];
+      return `<article class="item" data-p="${p.id}"><button class="thumb" type="button" data-pimg="${p.id}" aria-label="看 ${p.name} 的圖"><img src="${p.pimg}" alt="" loading="lazy"></button><div>
+      <div class="ih"><h3>${p.name}</h3><span class="pr">${fmt(p.price)}</span></div>${p.note?`<p class="hint" style="margin-top:2px">${p.note}</p>`:''}${sizeHTML(p.id)}
+      <div class="vs">${vs.map(v=>`<div class="v${v?'':' one'}"><span>${v||'數量'}</span><div class="step">
+      <button type="button" data-k="${K(p.id,v)}" data-d="-1" aria-label="${p.name} ${v} 減一">−</button>
+      <output data-q="${K(p.id,v)}">0</output>
+      <button type="button" data-k="${K(p.id,v)}" data-d="1" aria-label="${p.name} ${v} 加一">+</button></div></div>`).join('')}</div></div></article>`}).join('');
+  }
+}
+function syncForm(){
+  document.querySelectorAll('output[data-q]').forEach(o=>o.textContent=draft[o.dataset.q]||0);
+  document.querySelectorAll('.item').forEach(el=>{const id=el.dataset.p;el.classList.toggle('on',Object.keys(draft).some(k=>k.startsWith(id+'|')&&draft[k]>0))});
+  const t=tally(draft);
+  document.querySelectorAll('button[data-d="1"]').forEach(x=>x.disabled=t.q>=MAX);
+  document.querySelectorAll('button[data-d="-1"]').forEach(x=>x.disabled=false);
+  $('b-sub').textContent=`已選 ${t.q} / ${MAX} 件`;
+  $('b-amt').textContent=fmt(t.a);
+  $('cancel').hidden=!mine;
+  $('save').textContent=saving?'送出中…':mine?(dirty?'更新訂單':'已送出 ✓'):'送出訂單';
+  if(closed()){
+    document.querySelectorAll('.step button').forEach(x=>x.disabled=true);
+    ['nm','clear','cancel','save'].forEach(id=>$(id).disabled=true);
+    $('cancel').hidden=true;$('save').textContent='已截止';
+    $('dl').textContent='已於 12/7（一）18:00 截止';
+    say('loadmsg','員購已截止，可到「統計總表」查看結果');
+  }
+}
+function markDirty(){dirty=true;syncForm()}
+function matchName(){
+  const n=norm($('nm').value);const m=n?orders.find(o=>norm(o.name)===n):null;
+  if(m&&m!==mine){mine=m;draft={...m.items};dirty=false;say('loadmsg',`已帶出「${m.name}」送出的訂單，可直接修改`)}
+  else if(!m&&mine){mine=null;dirty=true;say('loadmsg','')}
+  syncForm();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]');if(!b)return;
+  if(closed()){syncForm();return}
+  const k=b.dataset.k,d=+b.dataset.d;
+  if(d>0&&tally(draft).q>=MAX){say('loadmsg',`每人限購 ${MAX} 件，已達上限`);return}
+  if(d>0)say('loadmsg','');
+  const n=Math.max(0,Math.min(MAX,(draft[k]||0)+d));
+  if(n)draft[k]=n;else delete draft[k];markDirty();
+});
+$('nm').addEventListener('input',()=>{dirty=true;clearTimeout(window._nt);window._nt=setTimeout(matchName,400)});
+$('nm').addEventListener('change',matchName);
+$('clear').onclick=()=>{draft={};markDirty()};
+
+function onData(res){orders=res.orders||[];loaded=true;renderSum();const n=norm($('nm').value);mine=n?orders.find(o=>norm(o.name)===n)||null:null;syncForm()}
+function onErr(e){saving=false;$('save').disabled=false;say('loadmsg',(e&&e.message||'發生錯誤').replace(/^Exception:\s*/,''));syncForm()}
+// 呼叫後端；人多或網路不穩時自動重試（最多 4 次，間隔逐次拉長）
+async function api(fn,args){
+  const res=fn==='getOrders'?await fetch(API+'?t='+Date.now()):await fetch(API,{method:'POST',body:JSON.stringify(fn==='submitOrder'?{action:'submit',name:args[0],items:args[1]}:{action:'cancel',name:args[0]})});
+  const j=await res.json();if(j.error)throw new Error(j.error);return j}
+function call(fn,args,ok,fail,tries=0){
+  api(fn,args).then(ok,e=>{
+    if(tries<3&&!/截止|姓名|品項|限購/.test(e&&e.message||'')){if(tries===0&&fn!=='getOrders')say('loadmsg','目前人比較多，正在重試…');setTimeout(()=>call(fn,args,ok,fail,tries+1),800*(tries+1)+Math.random()*1200)}
+    else fail(e&&/BUSY/.test(e.message||'')?{message:'目前人太多，請過一分鐘再按一次送出'}:(e&&/fetch|network/i.test(e.message||'')?{message:'連線失敗，請檢查網路後再試'}:e))
+  })}
+function load(){call('getOrders',[],r=>{onData(r);if($('loadmsg').textContent==='載入中…')say('loadmsg','')},onErr)}
+
+function save(){
+  if(closed()){syncForm();return}
+  const name=$('nm').value.trim();
+  if(!name){say('loadmsg','請先填寫姓名');$('nm').focus();return}
+  if(!tally(draft).q){say('loadmsg','還沒選任何品項喔');return}
+  if(tally(draft).q>MAX){say('loadmsg',`每人限購 ${MAX} 件，請減少數量`);return}
+  if(saving)return;saving=true;$('save').disabled=true;syncForm();
+  const was=!!mine;
+  call('submitOrder',[name,draft],r=>{saving=false;$('save').disabled=false;dirty=false;onData(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓')},onErr);
+}
+$('save').onclick=()=>{if(!$('pane-form').hidden)save();else show('form')};
+let cancelArm=false;
+$('cancel').onclick=()=>{
+  if(closed()||!mine){syncForm();return}
+  if(!cancelArm){cancelArm=true;$('cancel').textContent='再按一次確認取消';setTimeout(()=>{cancelArm=false;$('cancel').textContent='取消我的訂單'},4000);return}
+  cancelArm=false;$('cancel').textContent='取消我的訂單';
+  call('cancelOrder',[mine.name],r=>{draft={};dirty=false;onData(r);say('loadmsg','訂單已取消')},onErr);
+};
+
+// ---- summary
+function aggregate(){let tq=0,ta=0;const agg={};for(const o of orders){const t=tally(o.items||{});tq+=t.q;ta+=t.a;for(const k in o.items||{}){const n=parseInt(o.items[k])||0;if(n>0&&prod(k))agg[k]=(agg[k]||0)+n}}return{tq,ta,agg}}
+function renderSum(){
+  const {tq,ta,agg}=aggregate();
+  $('s-amt').textContent=fmt(ta);$('s-ppl').textContent=orders.length;$('s-qty').textContent=tq;
+  const rows=[];
+  for(const p of P){const vs=p.v||[''];const tot=vs.reduce((s,v)=>s+(agg[K(p.id,v)]||0),0);if(!tot)continue;
+    const det=p.v?vs.filter(v=>agg[K(p.id,v)]).map(v=>`${v}×${agg[K(p.id,v)]}`).join('、'):'—';
+    rows.push(`<tr><td>${p.name}</td><td>${det}</td><td class="n">${fmt(p.price)}</td><td class="n">${tot}</td><td class="n">${fmt(tot*p.price)}</td></tr>`)}
+  $('t-items').innerHTML=rows.join('')||'<tr><td colspan="5" class="empty">還沒有人下單</td></tr>';
+  const ppl=[...orders].sort((a,b)=>(a.updatedAt||0)-(b.updatedAt||0));
+  $('t-ppl').innerHTML=ppl.map(o=>`<tr><td><b>${esc(o.name)}</b></td><td>${itemText(o.items).map(esc).join('<br>')}</td><td class="n"><b>${fmt(tally(o.items||{}).a)}</b></td><td></td></tr>`).join('')||'<tr><td colspan="4" class="empty">還沒有人下單</td></tr>';
+}
+$('refresh').onclick=()=>{say('copymsg','更新中…');call('getOrders',[],r=>{onData(r);say('copymsg','已更新')},e=>say('copymsg','更新失敗，請稍後再試'))};
+$('copy').onclick=async()=>{
+  const {tq,ta,agg}=aggregate();
+  const L=['【何樂音樂 《要去什麼地方》演唱會周邊商品 員購】',`人數 ${orders.length}｜件數 ${tq}｜總金額 ${fmt(ta)}`,'','■ 品項'];
+  for(const p of P){const vs=p.v||[''];const tot=vs.reduce((s,v)=>s+(agg[K(p.id,v)]||0),0);if(!tot)continue;
+    L.push(`${p.name}（${fmt(p.price)}）：${tot}`+(p.v?'（'+vs.filter(v=>agg[K(p.id,v)]).map(v=>`${v}×${agg[K(p.id,v)]}`).join('、')+'）':''))}
+  L.push('','■ 每人明細');for(const o of orders)L.push(`${o.name}：${itemText(o.items).join('、')}｜${fmt(tally(o.items||{}).a)}`);
+  try{await navigator.clipboard.writeText(L.join('\n'));say('copymsg','已複製，可直接貼到 LINE 或 Email')}catch(e){say('copymsg','無法自動複製，請改用電腦瀏覽器開啟')}
+};
+
+// ---- tabs
+function show(w){const f=w==='form';$('pane-form').hidden=!f;$('pane-sum').hidden=f;
+  $('tab-form').setAttribute('aria-selected',f);$('tab-sum').setAttribute('aria-selected',!f);$('bar').hidden=!f;
+  document.body.style.paddingBottom=f?'96px':'24px';if(!f)$('refresh').click()}
+$('tab-form').onclick=()=>show('form');$('tab-sum').onclick=()=>show('sum');
+
+renderForm();syncForm();renderSum();load();
+if(!closed())setTimeout(syncForm,Math.min(DEADLINE-Date.now()+1000,2147483000));
+}</script>
+</body>
+</html>
