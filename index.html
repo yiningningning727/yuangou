@@ -127,6 +127,12 @@ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-bl
 </section>
 
 <section id="pane-sum" hidden>
+  <div class="card" id="lock">
+    <label class="f" for="pw">統計總表只限管理者查看，請輸入密碼</label>
+    <div style="display:flex;gap:8px"><input type="password" id="pw" autocomplete="current-password" style="flex:1"><button class="btn" id="pw-go" type="button">查看</button></div>
+    <p class="msg" id="pwmsg"></p>
+  </div>
+  <div id="sum" hidden>
   <div class="big">
     <div class="hero"><small>全部總金額</small><b id="s-amt">NT$0</b></div>
     <div><small>訂購人數</small><b id="s-ppl">0</b></div>
@@ -140,6 +146,7 @@ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-bl
   <table class="stack"><thead><tr><th>品項</th><th>款式 / 尺寸</th><th class="n">單價</th><th class="n">數量</th><th class="n">小計</th></tr></thead><tbody id="t-items"></tbody></table>
   <h2>每人明細</h2>
   <table class="stack"><thead><tr><th>姓名</th><th>品項</th><th class="n">金額</th><th></th></tr></thead><tbody id="t-ppl"></tbody></table>
+  </div>
 </section>
 </main>
 
@@ -252,11 +259,14 @@ function syncForm(){
   }
 }
 function markDirty(){dirty=true;syncForm()}
+let lookSeq=0;
 function matchName(){
-  const n=norm($('nm').value);const m=n?orders.find(o=>norm(o.name)===n):null;
-  if(m&&m!==mine){mine=m;draft={...m.items};dirty=false;say('loadmsg',`已帶出「${m.name}」送出的訂單，可直接修改`)}
-  else if(!m&&mine){mine=null;dirty=true;say('loadmsg','')}
-  syncForm();
+  const name=$('nm').value.trim();const seq=++lookSeq;
+  if(!name){if(mine){mine=null;syncForm()}return}
+  call('getMine',[name],r=>{if(seq!==lookSeq)return;const m=r.order;
+    if(m){if(!mine||norm(mine.name)!==norm(m.name)){mine=m;draft={...m.items};dirty=false;say('loadmsg',`已帶出「${m.name}」送出的訂單，可直接修改`)}}
+    else if(mine){mine=null;dirty=true;say('loadmsg','')}
+    syncForm()},()=>{});
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('button[data-k]');if(!b)return;
@@ -271,18 +281,19 @@ $('nm').addEventListener('input',()=>{dirty=true;clearTimeout(window._nt);window
 $('nm').addEventListener('change',matchName);
 $('clear').onclick=()=>{draft={};markDirty()};
 
-function onData(res){orders=res.orders||[];loaded=true;renderSum();const n=norm($('nm').value);mine=n?orders.find(o=>norm(o.name)===n)||null:null;syncForm()}
+function onMine(res){mine=res.order||null;syncForm()}
 function onErr(e){saving=false;$('save').disabled=false;say('loadmsg',(e&&e.message||'發生錯誤').replace(/^Exception:\s*/,''));syncForm()}
 // 呼叫後端；人多或網路不穩時自動重試（最多 4 次，間隔逐次拉長）
 async function api(fn,args){
-  const res=fn==='getOrders'?await fetch(API+'?t='+Date.now()):await fetch(API,{method:'POST',body:JSON.stringify(fn==='submitOrder'?{action:'submit',name:args[0],items:args[1]}:{action:'cancel',name:args[0]})});
+  const body=fn==='submitOrder'?{action:'submit',name:args[0],items:args[1]}:fn==='cancelOrder'?{action:'cancel',name:args[0]}:fn==='admin'?{action:'admin',password:args[0]}:null;
+  const res=fn==='getMine'?await fetch(API+'?name='+encodeURIComponent(args[0])+'&t='+Date.now()):await fetch(API,{method:'POST',body:JSON.stringify(body)});
   const j=await res.json();if(j.error)throw new Error(j.error);return j}
 function call(fn,args,ok,fail,tries=0){
   api(fn,args).then(ok,e=>{
-    if(tries<3&&!/截止|姓名|品項|限購/.test(e&&e.message||'')){if(tries===0&&fn!=='getOrders')say('loadmsg','目前人比較多，正在重試…');setTimeout(()=>call(fn,args,ok,fail,tries+1),800*(tries+1)+Math.random()*1200)}
+    if(tries<3&&!/截止|姓名|品項|限購|密碼/.test(e&&e.message||'')){if(tries===0&&/Order/.test(fn))say('loadmsg','目前人比較多，正在重試…');setTimeout(()=>call(fn,args,ok,fail,tries+1),800*(tries+1)+Math.random()*1200)}
     else fail(e&&/BUSY/.test(e.message||'')?{message:'目前人太多，請過一分鐘再按一次送出'}:(e&&/fetch|network/i.test(e.message||'')?{message:'連線失敗，請檢查網路後再試'}:e))
   })}
-function load(){call('getOrders',[],r=>{onData(r);if($('loadmsg').textContent==='載入中…')say('loadmsg','')},onErr)}
+
 
 function save(){
   if(closed()){syncForm();return}
@@ -292,7 +303,7 @@ function save(){
   if(tally(draft).q>MAX){say('loadmsg',`每人限購 ${MAX} 件，請減少數量`);return}
   if(saving)return;saving=true;$('save').disabled=true;syncForm();
   const was=!!mine;
-  call('submitOrder',[name,draft],r=>{saving=false;$('save').disabled=false;dirty=false;onData(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓')},onErr);
+  call('submitOrder',[name,draft],r=>{saving=false;$('save').disabled=false;dirty=false;onMine(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓')},onErr);
 }
 $('save').onclick=()=>{if(!$('pane-form').hidden)save();else show('form')};
 let cancelArm=false;
@@ -300,7 +311,7 @@ $('cancel').onclick=()=>{
   if(closed()||!mine){syncForm();return}
   if(!cancelArm){cancelArm=true;$('cancel').textContent='再按一次確認取消';setTimeout(()=>{cancelArm=false;$('cancel').textContent='取消我的訂單'},4000);return}
   cancelArm=false;$('cancel').textContent='取消我的訂單';
-  call('cancelOrder',[mine.name],r=>{draft={};dirty=false;onData(r);say('loadmsg','訂單已取消')},onErr);
+  call('cancelOrder',[mine.name],r=>{draft={};dirty=false;onMine(r);say('loadmsg','訂單已取消')},onErr);
 };
 
 // ---- summary
@@ -316,7 +327,11 @@ function renderSum(){
   const ppl=[...orders].sort((a,b)=>(a.updatedAt||0)-(b.updatedAt||0));
   $('t-ppl').innerHTML=ppl.map(o=>`<tr><td><b>${esc(o.name)}</b></td><td>${itemText(o.items).map(esc).join('<br>')}</td><td class="n"><b>${fmt(tally(o.items||{}).a)}</b></td><td></td></tr>`).join('')||'<tr><td colspan="4" class="empty">還沒有人下單</td></tr>';
 }
-$('refresh').onclick=()=>{say('copymsg','更新中…');call('getOrders',[],r=>{onData(r);say('copymsg','已更新')},e=>say('copymsg','更新失敗，請稍後再試'))};
+let PW='';
+function unlock(){const pw=$('pw').value;if(!pw){say('pwmsg','請輸入密碼');return}
+  say('pwmsg','確認中…');call('admin',[pw],r=>{PW=pw;orders=r.orders||[];renderSum();$('lock').hidden=true;$('sum').hidden=false;say('pwmsg','')},e=>say('pwmsg',(e&&e.message)||'無法連線'))}
+$('pw-go').onclick=unlock;$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
+$('refresh').onclick=()=>{if(!PW)return;say('copymsg','更新中…');call('admin',[PW],r=>{orders=r.orders||[];renderSum();say('copymsg','已更新')},e=>say('copymsg','更新失敗，請稍後再試'))};
 $('copy').onclick=async()=>{
   const {tq,ta,agg}=aggregate();
   const L=['【何樂音樂 《要去什麼地方》演唱會周邊商品 員購】',`人數 ${orders.length}｜件數 ${tq}｜總金額 ${fmt(ta)}`,'','■ 品項'];
@@ -329,10 +344,10 @@ $('copy').onclick=async()=>{
 // ---- tabs
 function show(w){const f=w==='form';$('pane-form').hidden=!f;$('pane-sum').hidden=f;
   $('tab-form').setAttribute('aria-selected',f);$('tab-sum').setAttribute('aria-selected',!f);$('bar').hidden=!f;
-  document.body.style.paddingBottom=f?'96px':'24px';if(!f)$('refresh').click()}
+  document.body.style.paddingBottom=f?'96px':'24px';if(!f&&PW)$('refresh').click()}
 $('tab-form').onclick=()=>show('form');$('tab-sum').onclick=()=>show('sum');
 
-renderForm();syncForm();renderSum();load();
+renderForm();syncForm();renderSum();say('loadmsg','');
 if(!closed())setTimeout(syncForm,Math.min(DEADLINE-Date.now()+1000,2147483000));
 }</script>
 </body>
