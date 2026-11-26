@@ -94,7 +94,7 @@ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-bl
   <div class="wrap">
     <img class="logo" src="img/logo.png" alt="The Land of Maybe — Hebe Tien" width="524" height="296">
     <h1>何樂音樂 《要去什麼地方》<br>演唱會周邊商品 員購</h1>
-    <p>每人限購 4 件｜<b id="dl">截止：12/7（一）18:00</b><br>選好後按「送出」，截止前可隨時回來修改</p>
+    <p><b id="dl">截止：12/9（三）23:59</b><br>選好後按「送出」，截止前可隨時回來修改</p>
     <svg class="deco" viewBox="0 0 92 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M10 22h72l-12 16H22z" fill="currentColor" fill-opacity=".25"/><path d="M46 22V6l14 12"/>
       <path d="M8 60q9-8 19 0t19 0 19 0 19 0"/><path d="M8 74q9-8 19 0t19 0 19 0 19 0"/>
@@ -153,7 +153,7 @@ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-bl
 </main>
 
 <div class="bar" id="bar"><div class="wrap">
-  <div class="t"><small id="b-sub">已選 0 / 4 件</small><b id="b-amt">NT$0</b></div>
+  <div class="t"><small id="b-sub">已選 0 件</small><b id="b-amt">NT$0</b></div>
   <button class="btn" id="save" type="button">送出訂單</button>
 </div></div>
 
@@ -203,8 +203,8 @@ const SIZE={'tee-black':TEE,'tee-white':TEE,
  'sweat-navy':{h:['尺寸','肩寬','胸寬','衣長','袖長','領圍'],r:[['S/M ①',58,59,69,56,19],['L/XL ②',61,62,73,59,20.5]]},
  'sweat-purple':WIDE,'sweat-green':WIDE};
 const sizeHTML=id=>{const t=SIZE[id];if(!t)return'';return `<details class="sz"><summary>尺寸表</summary><div class="scroll"><table><thead><tr>${t.h.map((h,i)=>`<th${i?' class="n"':''}>${h}</th>`).join('')}</tr></thead><tbody>${t.r.map(row=>`<tr>${row.map((c,i)=>`<td${i?' class="n"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="szn">平量，單位 cm，±2 cm 屬正常誤差</p></details>`};
-const MAX=4;
-const DEADLINE=new Date('2026-12-07T18:00:00+08:00').getTime();
+const MAX=99; // 每格數量上限（防打錯），總件數不限
+const DEADLINE=new Date('2026-12-09T23:59:59+08:00').getTime();
 P.forEach(p=>p.pimg='img/p/'+p.id+'.jpg');
 const closed=()=>Date.now()>DEADLINE;
 const $=id=>document.getElementById(id);
@@ -246,9 +246,9 @@ function syncForm(){
   document.querySelectorAll('output[data-q]').forEach(o=>o.textContent=draft[o.dataset.q]||0);
   document.querySelectorAll('.item').forEach(el=>{const id=el.dataset.p;el.classList.toggle('on',Object.keys(draft).some(k=>k.startsWith(id+'|')&&draft[k]>0))});
   const t=tally(draft);
-  document.querySelectorAll('button[data-d="1"]').forEach(x=>x.disabled=t.q>=MAX);
+  document.querySelectorAll('button[data-d="1"]').forEach(x=>x.disabled=(draft[x.dataset.k]||0)>=MAX);
   document.querySelectorAll('button[data-d="-1"]').forEach(x=>x.disabled=false);
-  $('b-sub').textContent=`已選 ${t.q} / ${MAX} 件`;
+  $('b-sub').textContent=`已選 ${t.q} 件`;
   $('b-amt').textContent=fmt(t.a);
   $('cancel').hidden=!mine;
   $('save').textContent=saving?'送出中…':mine?(dirty?'更新訂單':'已送出 ✓'):'送出訂單';
@@ -256,8 +256,8 @@ function syncForm(){
     document.querySelectorAll('.step button').forEach(x=>x.disabled=true);
     ['nm','pin','loadmine','clear','cancel','save'].forEach(id=>$(id).disabled=true);
     $('cancel').hidden=true;$('save').textContent='已截止';
-    $('dl').textContent='已於 12/7（一）18:00 截止';
-    say('loadmsg','員購已截止，可到「統計總表」查看結果');
+    $('dl').textContent='已於 12/9（三）23:59 截止';
+    say('loadmsg','填單已截止，可到「統計總表」查看結果');
   }
 }
 function markDirty(){dirty=true;syncForm()}
@@ -269,7 +269,7 @@ function matchName(){
   if(!name){exists=false;$('loadmine').hidden=true;syncForm();return}
   call('getMine',[name],r=>{if(seq!==lookSeq)return;exists=!!r.exists;
     $('loadmine').hidden=!exists||!!mine;
-    if(exists&&!mine)say('loadmsg','這個名字已經有訂單，輸入當時設的密碼，再按「帶出我的訂單」');
+    if(exists&&!mine)say('loadmsg','這個名字已經有訂單。是你本人就輸入當時的密碼按「帶出我的訂單」；是不同人請在名字後加部門或綽號（例如 陳美玲-企劃）再送出');
     else if(!exists&&!mine&&/^這個名字已經有訂單/.test($('loadmsg').textContent))say('loadmsg','');
     syncForm()},()=>{});
 }
@@ -286,7 +286,6 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('button[data-k]');if(!b)return;
   if(closed()){syncForm();return}
   const k=b.dataset.k,d=+b.dataset.d;
-  if(d>0&&tally(draft).q>=MAX){say('loadmsg',`每人限購 ${MAX} 件，已達上限`);return}
   if(d>0)say('loadmsg','');
   const n=Math.max(0,Math.min(MAX,(draft[k]||0)+d));
   if(n)draft[k]=n;else delete draft[k];markDirty();
@@ -315,10 +314,9 @@ function save(){
   if(!name){say('loadmsg','請先填寫姓名');$('nm').focus();return}
   if(!pinOK()){say('loadmsg','請設定 4 位數密碼');$('pin').focus();return}
   if(!tally(draft).q){say('loadmsg','還沒選任何品項喔');return}
-  if(tally(draft).q>MAX){say('loadmsg',`每人限購 ${MAX} 件，請減少數量`);return}
   if(saving)return;saving=true;$('save').disabled=true;syncForm();
   const was=!!mine;
-  call('submitOrder',[name,$('pin').value,draft],r=>{saving=false;$('save').disabled=false;dirty=false;exists=true;$('loadmine').hidden=true;onMine(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓，之後修改請用同一組密碼')},e=>{if(/^密碼錯誤$/.test(e&&e.message||''))e={message:'密碼錯誤：這個名字已經有人送出過訂單，請輸入當時設的密碼'};onErr(e)});
+  call('submitOrder',[name,$('pin').value,draft],r=>{saving=false;$('save').disabled=false;dirty=false;exists=true;$('loadmine').hidden=true;onMine(r);say('loadmsg',was?'已更新 ✓':'已送出 ✓，之後修改請用同一組密碼')},e=>{if(/^密碼錯誤$/.test(e&&e.message||''))e={message:'密碼錯誤。若你是這張單的本人，請輸入當時設的密碼；若是同名的不同人，請在名字後加部門或綽號（例如 陳美玲-企劃）再送出'};onErr(e)});
 }
 $('save').onclick=()=>{if(!$('pane-form').hidden)save();else show('form')};
 let cancelArm=false;
